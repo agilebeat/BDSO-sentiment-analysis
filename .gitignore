@@ -1,0 +1,9 @@
+.serverless/
+.idea/
+.requirements.zip
+node_modules/
+package-lock.json
+package.json
+python.venv/
+requirements.txt
+unzip_requirements.py
