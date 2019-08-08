@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: agilebeat_sentiment # NOTE: update this with your service name
+service: agilebeat # NOTE: update this with your service name
 
 provider:
   name: aws
@@ -63,7 +63,7 @@ functions:
 # you can add CloudFormation resource templates here
 resources:
   Resources:
-    tileInputValidator:
+    singlepostInputValidator:
       Type: "AWS::ApiGateway::RequestValidator"
       Properties:
         Name: 'singlepostInputValidator'
@@ -93,6 +93,7 @@ custom:
       - setuptools
       - six
       - tensorboard
+      - tensorflow
   documentation:
     api:
       info:
