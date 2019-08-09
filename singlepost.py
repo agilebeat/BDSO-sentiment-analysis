@@ -4,39 +4,56 @@ except ImportError:
   pass
 
 
+
 import json
-import boto3 
+#import boto3
+
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import re
 
 
-import tensorflow as tf
-from tensorflow.python.platform import gfile
-#from tensorflow.python.keras.preprocessing import image
-from PIL import Image
+def remove_pattern(input_txt, pattern):
+    r = re.findall(pattern, input_txt)
+    for i in r:
+        input_txt = re.sub(i, '', input_txt)
 
-import numpy as np
-import base64
-import io
+    return input_txt
 
-    
-    
-def run_classify_image(img):
-    
-    f = gfile.FastGFile("tf-models/tf_model.pb", 'rb')
-    graph_def = tf.GraphDef()
-   # Parses a serialized binary message into the current message.
-    graph_def.ParseFromString(f.read())
-    f.close()
 
-    sess = tf.Graph()
-    with sess.as_default() as graph:
-        tf.import_graph_def(graph_def)
-        softmax_tensor = sess.get_tensor_by_name('import/activation_15_2/Softmax:0')
+def clean_post(post):
+    # remove @username & hash
+    post_wo_usr = remove_pattern(post, "@[\w]*")
+    post_wo_usr_hash = post_wo_usr.replace("#", "")
 
-    with tf.Session(graph=graph) as sess:
-        predictions = sess.run(softmax_tensor, {'import/conv2d_6_input_2:0': img})
-         
-    return predictions    
-        
+    ### Removing Punctuations, Numbers, and Special Characters / short word
+    post_cleaned = post_wo_usr.replace("[^a-zA-Z#]", " ")
+    post_cleaned = [w for w in post_cleaned.split() if len(w) > 3]
+
+    return post_wo_usr, post_wo_usr_hash, post_cleaned
+
+
+def sentiment_scores(post):
+    analyser = SentimentIntensityAnalyzer()
+
+    snt = analyser.polarity_scores(post)
+
+    if snt['neg'] > 0 and snt['compound'] < 0:
+        polarity = 'negative'
+    elif snt['pos'] > 0 and snt['compound'] > 0:
+        polarity = 'positive'
+    else:
+        polarity = 'neutral'
+
+    snt_Score = snt['compound']
+
+    return polarity, snt_Score
+
+
+def analyze_post(post):
+    post_wo_usr, post_wo_usr_hash, post_cleaned = clean_post(post)
+    polarity, sen_Score = sentiment_scores(post_wo_usr_hash)
+
+    return polarity, sen_Score
 
 
 def singlepostHandler(event, context):
@@ -44,12 +61,12 @@ def singlepostHandler(event, context):
     body_json = json.loads(body_txt)
     post = body_json["post_content"]
 
-
+    polarity, sen_Score = analyze_post(post)
 
     response = {
         "statusCode": 200,
         "headers": {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-        "body": json.dumps({'post': post})
+        "body": json.dumps({'post': post, 'polarity':polarity, 'score':sen_Score})
     }
     
     return response
