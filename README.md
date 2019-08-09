@@ -33,7 +33,7 @@ docker container and have shell terminal: `root@<IMAGE-ID>:/root/bdso/BDSO-senti
    
    You should see:
    
-   `(python.venv) root@<IMAGE-ID>:~/root/bdso#`
+   `(python.venv) root@<IMAGE-ID>:~/root/bdso/BDSO-sentiment-analysis#`
    
 3. Install packages necessary for lambda in the virtual environment:
 
