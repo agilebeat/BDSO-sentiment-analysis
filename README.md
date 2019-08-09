@@ -19,7 +19,7 @@ control over aws). Finally we will deploy lambda function.
 
 At this point we are assuming that you have executed the steps listed in the
 Readme.md for the BDSO-docker-serverless project. You should have running 
-docker container and have shell terminal: `root@<IMAGE-ID>:/root/bdso#`
+docker container and have shell terminal: `root@<IMAGE-ID>:/root/bdso/BDSO-sentiment-analysis#`
 
 #### Step 1. Set pu virtual python environment
 
